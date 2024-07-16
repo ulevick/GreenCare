@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Reset and Basics */
+        body {
+            background-image: url('images/photo.jpeg');
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1; /* Ensures it stays behind other content */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1; /* Below the menu but above other content */
+        }
+
+        /* Header container styling */
+        .header-container {
+            position: relative;
+            background-color: #f4f4f4;
+            padding: 10px 0;
+        }
+
+        .header {
+            position: relative;
+            background-color: #fff;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header .logo {
+            text-decoration: none;
+            font-size: 45px;
+            font-weight: bold;
+            color: #224229;
+        }
+
+        .header nav {
+            display: flex;
+            padding-top: 0px;
+        }
+
+        .header nav a {
+            font-size: 16px;
+            text-decoration: none;
+            color: #224229;
+            padding: 18px 20px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .header nav a::after {
+            content: '';
+            display: block;
+            margin: auto;
+            height: 2px;
+            width: 0px;
+            background: transparent;
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+
+        .header nav a:hover::after,
+        .header nav a:focus::after {
+            width: 100%;
+            background: #224229;
+        }
+
+        .search-cart-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-cart-container .icon:not(:last-child) {
+            cursor: pointer;
+            transition: color 0.3s;
+            margin-right: 15px;
+        }
+
+        .search-cart-container .icon i {
+            font-size: 1.2rem;
+            color: #224229;
+        }
+
+        .search-cart-container .icon:hover i,
+        .search-cart-container .icon:focus i {
+            color: #224229;
+        }
+
+        .menu-icon {
+            display: none;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .menu-icon,
+        .search-cart-container {
+            flex: 0 0 auto;
+        }
+
+        /* Tab Selector for Log in & Sign UP */
+        .tab-selector {
+            display: flex;
+            justify-content: center;
+            margin-top: 70px;
+        }
+
+        .tab-selector .login-tab,
+        .tab-selector .signup-tab {
+            text-decoration: none;
+            padding-bottom: 8px;
+            letter-spacing: 1px;
+            font-family: 'Plantagenet Cherokee', serif;
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .tab-selector .signup-tab {
+            font-weight: bold;
+        }
+
+        .tab-selector .login-tab::after,
+        .tab-selector .signup-tab::after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: white;
+            transition: width 0.3s, left 0.3s;
+        }
+
+        .tab-selector .signup-tab::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .tab-selector .login-tab:hover::after,
+        .tab-selector .signup-tab:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        /* Registration Form Styling */
+        form {
+            position: relative;
+            background-color: #fff;
+            padding: 40px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            margin: 40px auto;
+        }
+
+        input[type=text], input[type=password], input[type=email] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #fafad2;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: sans-serif;
+        }
+
+        button {
+            width: 95%;
+            background-color: #224229;
+            color: white;
+            padding: 20px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: sans-serif;
+        }
+
+        button:hover {
+            background-color: #224229;
+        }
+
+        /* Password strength line */
+        .strength {
+            display: none;
+            height: 5px;
+            margin-bottom: 15px;
+            background-color: #ddd;
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+
+        .weak {
+            background-color: red;
+            width: 33%;
+        }
+
+        .medium {
+            background-color: yellow;
+            width: 50%;
+        }
+
+        .strong {
+            background-color: green;
+            width: 100%;
+        }
+
+        input[type="password"] + .strength {
+            width: calc(100% - 20px);
+            display: block;
+            box-sizing: border-box;
+            margin-top: 0px;
+        }
+
+        input[type=password].with-strength {
+            margin-bottom: 4px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 950px) {
+            .header {
+                justify-content: space-between;
+            }
+
+            .header .logo {
+                text-decoration: none;
+                position: static;
+                transform: none;
+                order: 2;
+                text-align: center;
+            }
+
+            .header .menu-icon {
+                display: block;
+                order: 1;
+            }
+
+            .header nav {
+                display: block;
+                flex-direction: column;
+                width: 34%;
+                position: fixed;
+                background-color: #224229;
+                top: 0;
+                left: -100%; /* Start off-screen */
+                z-index: 1000; /* Ensure it's above the overlay */
+                height: 100vh;
+                overflow-y: auto; /* Adds scroll bar if content is taller than the screen */
+                transition: left 0.5s ease;
+                padding-top: 20px;
+            }
+
+            .header nav a{
+                color: #ffffff;
+            }
+
+            .header nav a:hover::after,
+            .header nav a:focus::after {
+                width: 100%;
+                background: #ffffff;
+            }
+            .search-cart-container {
+                order: 3;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="overlay"></div>
+<div class="header-container">
+    <div class="header">
+        <a href="main.html" class="logo" style="font-family: 'Garamond', sans-serif;">GreenCare</a>
+        <div class="menu-icon"><i class="fa fa-bars"></i></div>
+        <nav>
+            <a href="#">PLANTS</a>
+            <a href="#">CARE TOOLS</a>
+            <a href="#">GIFTS</a>
+            <a href="#">LEARN</a>
+            <a href="#">CORPORATE GIFTS</a>
+        </nav>
+        <div class="search-cart-container">
+            <a href="login.html" class="icon"><i class="fa-regular fa-circle-user"></i></a>
+        </div>
+    </div>
+</div>
+
+<div class="tab-selector">
+    <a href="login.html" class="login-tab">Log in</a>
+    <a href="registration.html" class="signup-tab">Sign up</a>
+</div>
+
+<form id="registrationForm" method="POST" action="/register">
+    <label for="firstName">First Name</label>
+    <input type="text" id="firstName" name="firstName" required>
+    <label for="lastName">Last Name</label>
+    <input type="text" id="lastName" name="lastName" required>
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required>
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required oninput="checkPasswordStrength()">
+    <div id="strength" class="strength"></div>
+    <button type="submit">Sign up</button>
+</form>
+
+<script>
+    document.getElementById("registrationForm").addEventListener("submit", submitForm);
+    var menuIcon = document.querySelector('.menu-icon');
+    var nav = document.querySelector('nav');
+    var overlay = document.querySelector('.overlay');
+
+    function toggleNav() {
+        if (nav.style.left === "0px") {
+            nav.style.left = "-100%";
+            overlay.style.display = "none";
+        } else {
+            nav.style.left = "0";
+            overlay.style.display = "block";
+        }
+    }
+
+    menuIcon.onclick = toggleNav;
+
+    document.querySelectorAll('nav a').forEach(function(navLink) {
+        navLink.onclick = function() {
+            nav.style.left = "-100%";
+            overlay.style.display = "none";
+        };
+    });
+
+    overlay.onclick = function() {
+        nav.style.left = "-100%";
+        overlay.style.display = "none";
+    };
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 950) {
+            nav.style.left = '';
+            overlay.style.display = 'none';
+        } else {
+            nav.style.left = '-100%';
+            overlay.style.display = 'none';
+        }
+    });
+
+    function checkPasswordStrength() {
+        var strengthBar = document.getElementById("strength");
+        var passwordField = document.getElementById("password");
+        var password = passwordField.value;
+        var strength = 0;
+        var barWidth = 0;
+
+        if (password.length >= 8) strength += 1;
+        if (password.match(/[a-z]/)) strength += 1;
+        if (password.match(/[A-Z]/)) strength += 1;
+        if (password.match(/[0-9]/)) strength += 1;
+        if (password.match(/[^a-zA-Z0-9]/)) strength += 1;
+
+        if (strength > 0) {
+            barWidth = Math.min(strength * 20, 100);
+        }
+
+        if (password) {
+            strengthBar.style.display = 'block';
+            strengthBar.style.width = (390 * barWidth) / 100 + 'px';
+            passwordField.classList.add('with-strength');
+            if (strength <= 2) {
+                strengthBar.style.backgroundColor = 'red';
+            } else if (strength <= 3) {
+                strengthBar.style.backgroundColor = 'yellow';
+            } else {
+                strengthBar.style.backgroundColor = 'green';
+            }
+        } else {
+            strengthBar.style.display = 'none';
+            passwordField.classList.remove('with-strength');
+        }
+    }
+
+    function submitForm(event) {
+        event.preventDefault();
+
+        const formData = {
+            email: document.getElementById('email').value,
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value
+        };
+
+        fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Registration successful');
+                    alert('Registration successful');
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('Registration failed', error);
+                alert('Registration failed: ' + error.message);
+            });
+    }
+</script>
+</body>
+</html>
