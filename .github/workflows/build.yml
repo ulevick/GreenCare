@@ -20,13 +20,15 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin' # You can also use 'zulu' if needed
+          distribution: 'zulu' # Alternatively, you can use 'temurin' if preferred
 
       - name: Cache SonarQube packages
         uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
+          restore-keys: |
+            ${{ runner.os }}-sonar
 
       - name: Cache Maven packages
         uses: actions/cache@v3
@@ -37,8 +39,12 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build and analyze
-        working-directory: GreenCare/GreenCare/demo1 # Update this path to the directory containing pom.xml
+        working-directory: GreenCare/GreenCare/demo1 # Update this path if needed
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Make sure this secret is set in your GitHub repo
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=GreenCare \
-          -Dsonar.projectName="GreenCare"
-          -DskipTests
+          -Dsonar.projectName='GreenCare' \
+          -Dsonar.host.url=${{ env.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ env.SONAR_TOKEN }}
