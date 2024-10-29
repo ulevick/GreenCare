@@ -11,14 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Shallow clones are disabled for better relevancy of analysis
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin' # You can also use 'zulu' if needed
 
       - name: Cache SonarQube packages
         uses: actions/cache@v3
@@ -29,11 +31,21 @@ jobs:
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
-          path: ~/.m2
+          path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
       - name: Build and analyze
-        working-directory: GreenCare/GreenCare/demo1
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=GreenCare -Dsonar.projectName="GreenCare"
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=GreenCare \
+          -Dsonar.projectName="GreenCare"
+
+      - name: Post Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Post Run actions/checkout@v4
+        uses: actions/checkout@v4
